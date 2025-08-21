@@ -1,0 +1,180 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Create Table"
+      parameters:
+        componentName: "Start"
+    Create Table:
+      type: "create-table-v2"
+      transitions:
+        success:
+        - "S3 Load"
+      parameters:
+        componentName: "Create Table"
+        createMethod: "Create If Not Exists"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        table: "DEMOGRAPHIC"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "customer_id "
+          - "NUMBER"
+          - "10"
+          - ""
+          - ""
+          - "Yes"
+          - "Yes"
+          - ""
+          - ""
+        - - "first_name "
+          - "VARCHAR"
+          - "255"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "last_name "
+          - "VARCHAR"
+          - "255"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "phone"
+          - "VARCHAR"
+          - "25"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "email "
+          - "VARCHAR"
+          - "255"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "street"
+          - "VARCHAR"
+          - "255"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "city"
+          - "VARCHAR"
+          - "50"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "state "
+          - "VARCHAR"
+          - "25"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "zip_code"
+          - "VARCHAR"
+          - "5"
+          - ""
+          - "No"
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation:
+        primaryKeys:
+        clusteringKeys:
+        dataRetentionTimeInDays:
+        comment:
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    S3 Load:
+      type: "s3-load"
+      parameters:
+        componentName: "S3 Load"
+        stage: "[Custom]"
+        authentication: "Credentials"
+        s3ObjectPrefix: "s3://analyticsanas/customer/customers_cleaned.csv"
+        pattern: ".*"
+        encryption: "S3 Encryption"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "DEMOGRAPHIC"
+        loadColumns:
+        - "customer_id "
+        - "first_name "
+        - "last_name "
+        - "phone"
+        - "email "
+        - "street"
+        - "city"
+        - "state "
+        - "zip_code"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "True"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "True"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "False"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -180
+        "y": -20
+      tempMetlId: 1
+    Create Table:
+      position:
+        x: -20
+        "y": -20
+      tempMetlId: 2
+    S3 Load:
+      position:
+        x: 140
+        "y": -20
+      tempMetlId: 3
